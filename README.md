@@ -1,4 +1,6 @@
-# graphql-ws
+# @httptoolkit/graphql-ws
+
+_This is a fork of subscriptions-transport-ws, updating ws to fix security issues. This is a quick fix, and won't be maintained in future_
 
 The `subscriptions-transport-ws` library is not being actively maintained. It is recommended that you use the [graphql-ws](https://github.com/enisdenjo/graphql-ws) library instead. For details read the [GraphQL over WebSockets](https://the-guild.dev/blog/graphql-over-websockets) announcement.
 

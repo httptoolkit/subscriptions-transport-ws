@@ -1,5 +1,5 @@
 {
-  "name": "subscriptions-transport-ws",
+  "name": "@httptoolkit/subscriptions-transport-ws",
   "version": "0.9.18",
   "description": "A websocket transport for GraphQL subscriptions",
   "main": "dist/index.js",
