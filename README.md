@@ -1,12 +1,8 @@
-# @httptoolkit/graphql-ws
+# @httptoolkit/subscriptions-transport-ws
 
-_This is a fork of subscriptions-transport-ws, updating ws to fix security issues. This is a quick fix, and won't be maintained in future_
+_This is a fork of subscriptions-transport-ws, updating ws to fix security issues. This is a quick fix, and won't be maintained for general use outside [Mockttp](https://github.com/httptoolkit/mockttp) in future_
 
-The `subscriptions-transport-ws` library is not being actively maintained. It is recommended that you use the [graphql-ws](https://github.com/enisdenjo/graphql-ws) library instead. For details read the [GraphQL over WebSockets](https://the-guild.dev/blog/graphql-over-websockets) announcement.
-
-# subscriptions-transport-ws
-
-[![npm version](https://badge.fury.io/js/subscriptions-transport-ws.svg)](https://badge.fury.io/js/subscriptions-transport-ws) [![GitHub license](https://img.shields.io/github/license/apollostack/subscriptions-transport-ws.svg)](https://github.com/apollostack/subscriptions-transport-ws/blob/license/LICENSE)
+[![npm version](https://badge.fury.io/js/subscriptions-transport-ws.svg)](https://badge.fury.io/js/@httptoolkit/subscriptions-transport-ws) [![GitHub license](https://img.shields.io/github/license/httptoolkit/subscriptions-transport-ws.svg)](https://github.com/httptoolkit/subscriptions-transport-ws/blob/license/LICENSE)
 
 **(Work in progress!)**
 
@@ -14,17 +10,15 @@ A GraphQL WebSocket server and client to facilitate GraphQL queries, mutations a
 
 > `subscriptions-transport-ws` is an extension for GraphQL, and you can use it with any GraphQL client and server (not only Apollo).
 
-See [GitHunt-API](https://github.com/apollostack/GitHunt-API) and [GitHunt-React](https://github.com/apollostack/GitHunt-React) for an example server and client integration.
-
 # Getting Started
 
 Start by installing the package, using Yarn or NPM.
 
     Using Yarn:
-    $ yarn add subscriptions-transport-ws
+    $ yarn add @httptoolkit/subscriptions-transport-ws
 
     Or, using NPM:
-    $ npm install --save subscriptions-transport-ws
+    $ npm install --save @httptoolkit/subscriptions-transport-ws
 
 > Note that you need to use this package on both GraphQL client and server.
 
@@ -44,7 +38,7 @@ Now, create `SubscriptionServer` instance, with your GraphQL `schema`, `execute`
 
 ```js
 import { createServer } from 'http';
-import { SubscriptionServer } from 'subscriptions-transport-ws';
+import { SubscriptionServer } from '@httptoolkit/subscriptions-transport-ws';
 import { execute, subscribe } from 'graphql';
 import { schema } from './my-schema';
 
@@ -91,7 +85,7 @@ To start with a full WebSocket transport, that handles all types of GraphQL oper
 Then, create your `ApolloClient` instance and use the `SubscriptionsClient` instance as network interface:
 
 ```js
-import { SubscriptionClient } from 'subscriptions-transport-ws';
+import { SubscriptionClient } from '@httptoolkit/subscriptions-transport-ws';
 import ApolloClient from 'apollo-client';
 
 const GRAPHQL_ENDPOINT = 'ws://localhost:3000/graphql';
@@ -111,7 +105,7 @@ const apolloClient = new ApolloClient({
 To start with a hybrid WebSocket transport, that handles only `subscription`s over WebSocket, create your `SubscriptionClient` and a regular HTTP network interface, then extend your network interface to use the WebSocket client for GraphQL subscriptions:
 
 ```js
-import {SubscriptionClient, addGraphQLSubscriptions} from 'subscriptions-transport-ws';
+import {SubscriptionClient, addGraphQLSubscriptions} from '@httptoolkit/subscriptions-transport-ws';
 import ApolloClient, {createNetworkInterface} from 'apollo-client';
 
 // Create regular NetworkInterface by using apollo-client's API:
@@ -179,7 +173,7 @@ apolloClient.query({
 If you don't use any package/modules loader, you can still use this package, by using `unpkg` service, and get the client side package from:
 
 ```
-https://unpkg.com/subscriptions-transport-ws@VERSION/browser/client.js
+https://unpkg.com/@httptoolkit/subscriptions-transport-ws@VERSION/browser/client.js
 ```
 
 > Replace VERSION with the latest version of the package.
@@ -203,7 +197,7 @@ app.use('/graphiql', graphiqlExpress({
 If you are using older version, or another GraphQL server, start by modifying GraphiQL static HTML, and add this package and it's fetcher from CDN:
 
 ```html
-    <script src="//unpkg.com/subscriptions-transport-ws@0.5.4/browser/client.js"></script>
+    <script src="//unpkg.com/@httptoolkit/subscriptions-transport-ws@0.5.4/browser/client.js"></script>
     <script src="//unpkg.com/graphiql-subscriptions-fetcher@0.0.2/browser/client.js"></script>
 ```
 
