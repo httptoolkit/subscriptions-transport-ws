@@ -256,13 +256,14 @@ describe('Client', function () {
   afterEach(() => {
     if (wsServer) {
       wsServer.close();
+      wsServer.clients.forEach((ws) => ws.terminate());
     }
   });
 
   it('should send GQL_CONNECTION_INIT message when creating the connection', (done) => {
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
-        const parsedMessage = JSON.parse(message);
+      connection.on('message', (message: Buffer) => {
+        const parsedMessage = JSON.parse(message.toString());
         expect(parsedMessage.type).to.equals(MessageTypes.GQL_CONNECTION_INIT);
         done();
       });
@@ -286,8 +287,8 @@ describe('Client', function () {
     });
 
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
-        const parsedMessage = JSON.parse(message);
+      connection.on('message', (message: Buffer) => {
+        const parsedMessage = JSON.parse(message.toString());
 
         if (parsedMessage.type === MessageTypes.GQL_START) {
           subscriptionsCount++;
@@ -321,8 +322,8 @@ describe('Client', function () {
     let sub: any;
     const client = new SubscriptionClient(`ws://localhost:${RAW_TEST_PORT}/`);
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
-        const parsedMessage = JSON.parse(message);
+      connection.on('message', (message: Buffer) => {
+        const parsedMessage = JSON.parse(message.toString());
         // mock server
         if (parsedMessage.type === MessageTypes.GQL_CONNECTION_INIT) {
           connection.send(JSON.stringify({ type: MessageTypes.GQL_CONNECTION_ACK, payload: {} }));
@@ -501,8 +502,8 @@ describe('Client', function () {
 
   it('should allow both data and errors on GQL_DATA', (done) => {
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
-        const parsedMessage = JSON.parse(message);
+      connection.on('message', (message: Buffer) => {
+        const parsedMessage = JSON.parse(message.toString());
         // mock server
         if (parsedMessage.type === MessageTypes.GQL_CONNECTION_INIT) {
           connection.send(JSON.stringify({ type: MessageTypes.GQL_CONNECTION_ACK, payload: {} }));
@@ -553,8 +554,8 @@ describe('Client', function () {
       test: true,
     };
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
-        const parsedMessage = JSON.parse(message);
+      connection.on('message', (message: Buffer) => {
+        const parsedMessage = JSON.parse(message.toString());
         expect(JSON.stringify(parsedMessage.payload)).to.equal(JSON.stringify(connectionParams));
         done();
       });
@@ -570,8 +571,8 @@ describe('Client', function () {
       test: true,
     };
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
-        const parsedMessage = JSON.parse(message);
+      connection.on('message', (message: Buffer) => {
+        const parsedMessage = JSON.parse(message.toString());
         expect(JSON.stringify(parsedMessage.payload)).to.equal(JSON.stringify(connectionParams));
         done();
       });
@@ -591,8 +592,8 @@ describe('Client', function () {
       test: true,
     };
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
-        const parsedMessage = JSON.parse(message);
+      connection.on('message', (message: Buffer) => {
+        const parsedMessage = JSON.parse(message.toString());
         expect(JSON.stringify(parsedMessage.payload)).to.equal(JSON.stringify(connectionParams));
         done();
       });
@@ -611,8 +612,8 @@ describe('Client', function () {
     const error = 'foo';
 
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
-        const parsedMessage = JSON.parse(message);
+      connection.on('message', (message: Buffer) => {
+        const parsedMessage = JSON.parse(message.toString());
         expect(parsedMessage.payload).to.equal(error);
         done();
       });
@@ -681,7 +682,7 @@ describe('Client', function () {
 
   it('should handle correctly GQL_CONNECTION_ERROR message', (done) => {
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
+      connection.on('message', (message: Buffer) => {
         connection.send(JSON.stringify({
           type: MessageTypes.GQL_CONNECTION_ERROR,
           payload: { message: 'test error' },
@@ -701,7 +702,7 @@ describe('Client', function () {
     let client: any = null;
 
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
+      connection.on('message', (message: Buffer) => {
         connection.send(JSON.stringify({
           type: MessageTypes.GQL_CONNECTION_ERROR,
           payload: { message: 'test error' },
@@ -721,7 +722,7 @@ describe('Client', function () {
 
   it('should handle correctly GQL_CONNECTION_ACK message', (done) => {
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
+      connection.on('message', (message: Buffer) => {
         connection.send(JSON.stringify({ type: MessageTypes.GQL_CONNECTION_ACK }));
       });
     });
@@ -739,7 +740,7 @@ describe('Client', function () {
     server.listen(ACK_ONCONNECTED_TEST_PORT);
     const wss = new WebSocket.Server({server});
     wss.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
+      connection.on('message', (message: Buffer) => {
         connection.send(JSON.stringify({ type: MessageTypes.GQL_CONNECTION_ACK, payload: {appVersion: '1.0.0'} }));
         wss.close();
       });
@@ -757,7 +758,7 @@ describe('Client', function () {
     server.listen(ACK_ONRECONNECTED_TEST_PORT);
     const wss = new WebSocket.Server({server});
     wss.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
+      connection.on('message', (message: Buffer) => {
         connection.send(JSON.stringify({ type: MessageTypes.GQL_CONNECTION_ACK, payload: {appVersion: '1.0.0'} }));
         wss.close();
       });
@@ -887,8 +888,8 @@ describe('Client', function () {
 
   function testBadServer(payload: any, errorMessage: string, done: Function) {
     wsServer.on('connection', (connection: WebSocket) => {
-      connection.on('message', (message: any) => {
-        const parsedMessage = JSON.parse(message);
+      connection.on('message', (message: Buffer) => {
+        const parsedMessage = JSON.parse(message.toString());
         if (parsedMessage.type === MessageTypes.GQL_START) {
           connection.send(JSON.stringify({
             type: MessageTypes.GQL_ERROR,
@@ -969,11 +970,11 @@ describe('Client', function () {
       , sub: any = null;
 
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
+      connection.on('message', (message: Buffer) => {
         if (!isDone) {
           isDone = true;
           try {
-            const parsedMessage = JSON.parse(message);
+            const parsedMessage = JSON.parse(message.toString());
             if ( sub ) {
               sub.unsubscribe();
             }
@@ -1043,8 +1044,8 @@ describe('Client', function () {
     let client: SubscriptionClient = null;
     wsServer.on('connection', (connection: WebSocket) => {
       connections += 1;
-      connection.on('message', (message: any) => {
-        const parsedMessage = JSON.parse(message);
+      connection.on('message', (message: Buffer) => {
+        const parsedMessage = JSON.parse(message.toString());
         if (parsedMessage.type === MessageTypes.GQL_START) {
           if (connections === 1) {
             client.client.close();
@@ -1122,8 +1123,8 @@ describe('Client', function () {
     });
     const connectSpy = sinon.spy(subscriptionsClient as any, 'connect');
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
-        const parsedMessage = JSON.parse(message);
+      connection.on('message', (message: Buffer) => {
+        const parsedMessage = JSON.parse(message.toString());
         // mock server
         if (parsedMessage.type === MessageTypes.GQL_CONNECTION_INIT) {
           connection.close();
@@ -1146,8 +1147,8 @@ describe('Client', function () {
     const connectSpy = sinon.spy(subscriptionsClient as any, 'connect');
     let connections = 0;
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
-        const parsedMessage = JSON.parse(message);
+      connection.on('message', (message: Buffer) => {
+        const parsedMessage = JSON.parse(message.toString());
         // mock server
         if (parsedMessage.type === MessageTypes.GQL_CONNECTION_INIT) {
           ++connections;
@@ -1291,8 +1292,8 @@ describe('Client', function () {
     const tryReconnectSpy = sinon.spy(subscriptionsClient as any, 'tryReconnect');
     let receivedConnecitonTerminate = false;
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
-        const parsedMessage = JSON.parse(message);
+      connection.on('message', (message: Buffer) => {
+        const parsedMessage = JSON.parse(message.toString());
         // mock server
         if (parsedMessage.type === MessageTypes.GQL_CONNECTION_INIT) {
           connection.send(JSON.stringify({ type: MessageTypes.GQL_CONNECTION_ACK, payload: {} }));
@@ -1329,8 +1330,8 @@ describe('Client', function () {
     const tryReconnectSpy = sinon.spy(subscriptionsClient as any, 'tryReconnect');
     let receivedConnecitonTerminate = false;
     wsServer.on('connection', (connection: any) => {
-      connection.on('message', (message: any) => {
-        const parsedMessage = JSON.parse(message);
+      connection.on('message', (message: Buffer) => {
+        const parsedMessage = JSON.parse(message.toString());
         // mock server
         if (parsedMessage.type === MessageTypes.GQL_CONNECTION_INIT) {
           connection.send(JSON.stringify({ type: MessageTypes.GQL_CONNECTION_ACK, payload: {} }));
@@ -1773,12 +1774,14 @@ describe('Server', function () {
 
     const originalOnMessage = subscriptionsClient.client.onmessage;
     subscriptionsClient.client.onmessage = (dataReceived: any) => {
-      let messageData = JSON.parse(dataReceived.data);
+      let messageData = JSON.parse(dataReceived.data.toString());
       // Reformat message to avoid unknown message type
       if (messageData.type === MessageTypes.INIT_FAIL) {
         messageData.type = MessageTypes.GQL_CONNECTION_ERROR;
       }
-      dataReceived.data = JSON.stringify(messageData);
+      Object.defineProperty(dataReceived, 'data', { // Data is not a writable property
+        value: JSON.stringify(messageData),
+      });
       originalOnMessage(dataReceived);
     };
 

@@ -173,8 +173,11 @@ export class SubscriptionClient {
       this.client.close();
       this.client.onopen = null;
       this.client.onclose = null;
-      this.client.onerror = null;
       this.client.onmessage = null;
+
+      // Ignore errors after close - without this uncaught 'error' events can crash node
+      this.client.onerror = () => { /* No-op */ };
+
       this.client = null;
       this.eventEmitter.emit('disconnected');
 
@@ -589,8 +592,8 @@ export class SubscriptionClient {
       this.eventEmitter.emit('error', err);
     };
 
-    this.client.onmessage = ({ data }: {data: any}) => {
-      this.processReceivedData(data);
+    this.client.onmessage = ({ data }: {data: string | Buffer}) => {
+      this.processReceivedData(data.toString());
     };
   }
 

@@ -176,6 +176,7 @@ export class SubscriptionServer {
     this.closeHandler = () => {
       this.wsServer.removeListener('connection', connectionHandler);
       this.wsServer.close();
+      this.wsServer.clients.forEach((ws) => ws.terminate());
     };
   }
 
@@ -221,10 +222,10 @@ export class SubscriptionServer {
   }
 
   private onMessage(connectionContext: ConnectionContext) {
-    return (message: any) => {
+    return (message: Buffer) => {
       let parsedMessage: OperationMessage;
       try {
-        parsedMessage = parseLegacyProtocolMessage(connectionContext, JSON.parse(message));
+        parsedMessage = parseLegacyProtocolMessage(connectionContext, JSON.parse(message.toString()));
       } catch (e) {
         this.sendError(connectionContext, null, { message: e.message }, MessageTypes.GQL_CONNECTION_ERROR);
         return;
